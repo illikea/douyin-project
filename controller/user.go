@@ -34,8 +34,9 @@ type UserResponse struct {
 
 func Register(c *gin.Context) {
 	username := c.Query("username")
+	password := c.Query("password")
 
-	token := username
+	token := username + password
 
 	if _, exist := usersLoginInfo[token]; exist {
 		c.JSON(http.StatusOK, UserLoginResponse{
@@ -47,19 +48,20 @@ func Register(c *gin.Context) {
 			Id:   userIdSequence,
 			Name: username,
 		}
-		usersLoginInfo[username] = newUser
+		usersLoginInfo[token] = newUser
 		c.JSON(http.StatusOK, UserLoginResponse{
-			Response: Response{StatusCode: 0, StatusMsg: "User login success"},
+			Response: Response{StatusCode: 0, StatusMsg: "User register success"},
 			UserId:   userIdSequence,
-			Token:    username,
+			Token:    username + password,
 		})
 	}
 }
 
 func Login(c *gin.Context) {
 	username := c.Query("username")
+	password := c.Query("password")
 
-	token := username
+	token := username + password
 
 	if user, exist := usersLoginInfo[token]; exist {
 		c.JSON(http.StatusOK, UserLoginResponse{
