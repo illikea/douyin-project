@@ -50,7 +50,7 @@ func Register(c *gin.Context) {
 		}
 		usersLoginInfo[token] = newUser
 		c.JSON(http.StatusOK, UserLoginResponse{
-			Response: Response{StatusCode: 0},
+			Response: Response{StatusCode: 0, StatusMsg: "User login success"},
 			UserId:   userIdSequence,
 			Token:    username + password,
 		})
