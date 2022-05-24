@@ -10,13 +10,13 @@ import (
 // user data will be cleared every time the server starts
 // test data: username=zhanglei, password=douyin
 var usersLoginInfo = map[string]User{
-	"zhangleidouyin": {
+	/*"zhangleidouyin": {
 		Id:            1,
 		Name:          "zhanglei",
 		FollowCount:   10,
 		FollowerCount: 5,
 		IsFollow:      true,
-	},
+	},*/
 }
 
 var userIdSequence = int64(1)
