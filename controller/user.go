@@ -48,7 +48,7 @@ func Register(c *gin.Context) {
 			Id:   userIdSequence,
 			Name: username,
 		}
-		usersLoginInfo[username] = newUser
+		usersLoginInfo[token] = newUser
 		c.JSON(http.StatusOK, UserLoginResponse{
 			Response: Response{StatusCode: 0, StatusMsg: "User login success"},
 			UserId:   userIdSequence,
