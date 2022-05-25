@@ -12,10 +12,8 @@ func FavoriteAction(c *gin.Context) {
 
 	if _, exist := usersLoginInfo[token]; exist {
 		if action_type == "1" {
-			DemoVideos[0].IsFavorite = true //只对默认视频有用
 			c.JSON(http.StatusOK, Response{StatusCode: 0, StatusMsg: "Like success"})
 		} else if action_type == "2" {
-			DemoVideos[0].IsFavorite = false //只对默认视频有用
 			c.JSON(http.StatusOK, Response{StatusCode: 0, StatusMsg: "Unlike success"})
 		}
 	} else {

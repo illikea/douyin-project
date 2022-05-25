@@ -13,9 +13,14 @@ type UserListResponse struct {
 // RelationAction no practical effect, just check if token is valid
 func RelationAction(c *gin.Context) {
 	token := c.Query("token")
+	action_type := c.Query("action_type")
 
 	if _, exist := usersLoginInfo[token]; exist {
-		c.JSON(http.StatusOK, Response{StatusCode: 0})
+		if action_type == "1" {
+			c.JSON(http.StatusOK, Response{StatusCode: 0, StatusMsg: "Follow success"})
+		} else if action_type == "2" {
+			c.JSON(http.StatusOK, Response{StatusCode: 0, StatusMsg: "Unfollow success"})
+		}
 	} else {
 		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
 	}
