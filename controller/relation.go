@@ -17,10 +17,14 @@ func RelationAction(c *gin.Context) {
 
 	if _, exist := usersLoginInfo[token]; exist {
 		if action_type == "1" {
-			DemoUser.IsFollow = true //仅对默认用户有效
+			DemoUser.IsFollow = true    //所有用户共用
+			DemoUser.FollowerCount += 1 //所有用户共用
+			DemoUser.FollowCount += 1   //所有用户共用
 			c.JSON(http.StatusOK, Response{StatusCode: 0, StatusMsg: "Follow success"})
 		} else if action_type == "2" {
-			DemoUser.IsFollow = false //仅对默认用户有效
+			DemoUser.IsFollow = false   //所有用户共用
+			DemoUser.FollowerCount -= 1 //所有用户共用
+			DemoUser.FollowCount -= 1   //所有用户共用
 			c.JSON(http.StatusOK, Response{StatusCode: 0, StatusMsg: "Unfollow success"})
 		}
 	} else {

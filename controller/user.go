@@ -82,7 +82,7 @@ func UserInfo(c *gin.Context) {
 
 	if user, exist := usersLoginInfo[token]; exist {
 		c.JSON(http.StatusOK, UserResponse{
-			Response: Response{StatusCode: 0},
+			Response: Response{StatusCode: 0, StatusMsg: ""},
 			User:     user,
 		})
 	} else {
