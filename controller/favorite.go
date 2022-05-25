@@ -8,9 +8,14 @@ import (
 // FavoriteAction no practical effect, just check if token is valid
 func FavoriteAction(c *gin.Context) {
 	token := c.Query("token")
+	action_type := c.Query("action_type")
 
 	if _, exist := usersLoginInfo[token]; exist {
-		c.JSON(http.StatusOK, Response{StatusCode: 0, StatusMsg: "Action success"})
+		if action_type == "1" {
+			c.JSON(http.StatusOK, Response{StatusCode: 0, StatusMsg: "Like success"})
+		} else {
+			c.JSON(http.StatusOK, Response{StatusCode: 0, StatusMsg: "Unlike success"})
+		}
 	} else {
 		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
 	}
