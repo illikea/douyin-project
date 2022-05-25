@@ -2,7 +2,6 @@ package controller
 
 import (
 	"net/http"
-	"strings"
 	"sync/atomic"
 
 	"github.com/gin-gonic/gin"
@@ -64,7 +63,6 @@ func Login(c *gin.Context) {
 	password := c.Query("password")
 
 	token := username + password
-	usernameLen := strings.Count(username, "")
 
 	if user, exist := usersLoginInfo[token]; exist {
 		c.JSON(http.StatusOK, UserLoginResponse{
@@ -72,13 +70,9 @@ func Login(c *gin.Context) {
 			UserId:   user.Id,
 			Token:    token,
 		})
-	} else if token[usernameLen:] != password {
-		c.JSON(http.StatusOK, UserLoginResponse{
-			Response: Response{StatusCode: 1, StatusMsg: "password error"},
-		})
 	} else {
 		c.JSON(http.StatusOK, UserLoginResponse{
-			Response: Response{StatusCode: 1, StatusMsg: "User doesn't exist"},
+			Response: Response{StatusCode: 1, StatusMsg: "User doesn't exist or password error"},
 		})
 	}
 }
