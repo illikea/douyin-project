@@ -1,5 +1,10 @@
 package controller
 
+import (
+	"fmt"
+	"github.com/jmoiron/sqlx"
+)
+
 type Response struct {
 	StatusCode int32  `json:"status_code"`
 	StatusMsg  string `json:"status_msg,omitempty"`
@@ -28,4 +33,16 @@ type User struct {
 	FollowCount   int64  `json:"follow_count,omitempty"`
 	FollowerCount int64  `json:"follower_count,omitempty"`
 	IsFollow      bool   `json:"is_follow,omitempty"`
+}
+
+var db *sqlx.DB
+
+func dbInit() {
+	database, err := sqlx.Open("mysql", "root:root@tcp(127.0.0.1:3306)/test")
+	if err != nil {
+		fmt.Println("open mysql failed,", err)
+		return
+	}
+	db = database
+	defer db.Close() // 注意这行代码要写在上面err判断的下面
 }
