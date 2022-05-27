@@ -38,7 +38,7 @@ type User struct {
 var db *sqlx.DB
 
 func dbInit() {
-	database, err := sqlx.Open("mysql", "root:root@tcp(127.0.0.1:3306)/test")
+	database, err := sqlx.Open("mysql", "root:flash123@tcp(localhost:3306)/douyint")
 	if err != nil {
 		fmt.Println("open mysql failed,", err)
 		return
