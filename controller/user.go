@@ -39,10 +39,13 @@ func Register(c *gin.Context) {
 
 	token := username + password
 	dbInit()
-	var user []User
-	err := db.Select(&user, "select token from User where token=?", token)
+	//mysql test:
+	//var user []User
+	//err := db.Select(&user, "select token from User where token=?", token)
 
-	if err != nil {
+	//mysql test:
+	//if err != nil {
+	if _, exist := usersLoginInfo[token]; exist {
 		c.JSON(http.StatusOK, UserLoginResponse{
 			Response: Response{StatusCode: 1, StatusMsg: "User already exist"},
 		})
@@ -53,12 +56,14 @@ func Register(c *gin.Context) {
 			Name: username,
 		}
 		usersLoginInfo[token] = newUser
-		_, err := db.Exec("insert into User(FollowCount, FollowerCount, ID, IsFollow, Name, token)value(?, ?, ?, ?, ?, ?)", 0, 0, 0, 0, username, token)
-		if err != nil {
-			c.JSON(http.StatusOK, UserLoginResponse{
-				Response: Response{StatusCode: 1, StatusMsg: "User register fail"},
-			})
-		}
+		db.Exec("insert into User(FollowCount, FollowerCount, ID, IsFollow, Name, token)value(?, ?, ?, ?, ?, ?)", 0, 0, 0, 0, username, token)
+		//mysql test
+		//_, err := db.Exec("insert into User(FollowCount, FollowerCount, ID, IsFollow, Name, token)value(?, ?, ?, ?, ?, ?)", 0, 0, 0, 0, username, token)
+		//if err != nil {
+		//	c.JSON(http.StatusOK, UserLoginResponse{
+		//		Response: Response{StatusCode: 1, StatusMsg: "User register fail"},
+		//	})
+		//}
 		c.JSON(http.StatusOK, UserLoginResponse{
 			Response: Response{StatusCode: 0, StatusMsg: "User register success"},
 			UserId:   userIdSequence,
