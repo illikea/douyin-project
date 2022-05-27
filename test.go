@@ -30,15 +30,18 @@ func test() {
 	username := "12345"
 	token := "12345123456"
 	dbInit()
+	defer db.Close()
 	var user []dbUser
-	err := db.Select(&user, "select ID from User where token=?", "12345123456")
-
-	if err != nil {
+	//查询
+	err := db.Select(&user, "select ID from User where token=?", token)
+	//若查询到则直接返回
+	if user != nil {
 		fmt.Println("existed\n", err)
 		return
+	} else {
+		//没查到则插入
+		db.Exec("insert into User(FollowCount, FollowerCount, ID, IsFollow, Name, token)value(?, ?, ?, ?, ?, ?)", 0, 0, 0, 0, username, token)
 	}
-	defer db.Close()
-	db.Exec("insert into User(FollowCount, FollowerCount, ID, IsFollow, Name, token)value(?, ?, ?, ?, ?, ?)", 0, 0, 0, 0, username, token)
 }
 
 func main() {
