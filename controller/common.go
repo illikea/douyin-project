@@ -47,3 +47,12 @@ func dbInit() {
 	//因为会提前关闭，暂时不关闭
 	//defer db.Close() // 注意这行代码要写在上面err判断的下面
 }
+
+type dbUser struct {
+	ID            int64  `db:"ID"`
+	Name          string `db:"Name"`
+	FollowCount   int64  `db:"FollowCount"`
+	FollowerCount int64  `db:"FollowerCount"`
+	IsFollow      bool   `db:"IsFollow"`
+	token         string `db:"token"`
+}

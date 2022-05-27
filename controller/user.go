@@ -39,31 +39,30 @@ func Register(c *gin.Context) {
 
 	token := username + password
 	dbInit()
-	//mysql test:
-	//var user []User
-	//err := db.Select(&user, "select token from User where token=?", token)
-
-	//mysql test:
-	//if err != nil {
-	if _, exist := usersLoginInfo[token]; exist {
+	defer db.Close()
+	var user []dbUser
+	//查询
+	db.Select(&user, "select ID from User where token=?", token)
+	//若查询到则直接返回
+	if user != nil {
 		c.JSON(http.StatusOK, UserLoginResponse{
 			Response: Response{StatusCode: 1, StatusMsg: "User already exist"},
 		})
 	} else {
 		atomic.AddInt64(&userIdSequence, 1)
-		newUser := User{
-			Id:   userIdSequence,
-			Name: username,
-		}
-		usersLoginInfo[token] = newUser
-		db.Exec("insert into User(FollowCount, FollowerCount, ID, IsFollow, Name, token)value(?, ?, ?, ?, ?, ?)", 0, 0, 0, 0, username, token)
-		//mysql test
-		//_, err := db.Exec("insert into User(FollowCount, FollowerCount, ID, IsFollow, Name, token)value(?, ?, ?, ?, ?, ?)", 0, 0, 0, 0, username, token)
-		//if err != nil {
-		//	c.JSON(http.StatusOK, UserLoginResponse{
-		//		Response: Response{StatusCode: 1, StatusMsg: "User register fail"},
-		//	})
+		//newUser := User{
+		//	Id:   userIdSequence,
+		//	Name: username,
 		//}
+		//usersLoginInfo[token] = newUser
+
+		//mysql test
+		_, err := db.Exec("insert into User(FollowCount, FollowerCount, ID, IsFollow, Name, token)value(?, ?, ?, ?, ?, ?)", 0, 0, 0, 0, username, token)
+		if err != nil {
+			c.JSON(http.StatusOK, UserLoginResponse{
+				Response: Response{StatusCode: 1, StatusMsg: "User register fail"},
+			})
+		}
 		c.JSON(http.StatusOK, UserLoginResponse{
 			Response: Response{StatusCode: 0, StatusMsg: "User register success"},
 			UserId:   userIdSequence,
