@@ -44,5 +44,6 @@ func dbInit() {
 		return
 	}
 	db = database
-	defer db.Close() // 注意这行代码要写在上面err判断的下面
+	//因为会提前关闭，暂时不关闭
+	//defer db.Close() // 注意这行代码要写在上面err判断的下面
 }
