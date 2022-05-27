@@ -40,7 +40,7 @@ func Register(c *gin.Context) {
 	token := username + password
 	dbInit()
 	var user []User
-	err := db.Select(&user, "select token from User where token=?", 1)
+	err := db.Select(&user, "select token from User where token=?", token)
 
 	if err != nil {
 		c.JSON(http.StatusOK, UserLoginResponse{
