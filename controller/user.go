@@ -77,10 +77,16 @@ func Login(c *gin.Context) {
 
 	token := username + password
 
-	if user, exist := usersLoginInfo[token]; exist {
+	dbInit()
+	defer db.Close()
+	var user []dbUser
+	//查询
+	db.Select(&user, "select ID from User where token=?", token)
+
+	if user != nil {
 		c.JSON(http.StatusOK, UserLoginResponse{
 			Response: Response{StatusCode: 0},
-			UserId:   user.Id,
+			UserId:   user[0].ID,
 			Token:    token,
 		})
 	} else {
@@ -93,10 +99,24 @@ func Login(c *gin.Context) {
 func UserInfo(c *gin.Context) {
 	token := c.Query("token")
 
-	if user, exist := usersLoginInfo[token]; exist {
+	dbInit()
+	defer db.Close()
+	var user []dbUser
+	//查询
+	db.Select(&user, "select ID, Name, FollowCount, FollowerCount, IsFollow from User where token=?", token)
+
+	var ResponseUser = User{
+		Id:            user[0].ID,
+		Name:          user[0].Name,
+		FollowCount:   user[0].FollowCount,
+		FollowerCount: user[0].FollowerCount,
+		IsFollow:      user[0].IsFollow,
+	}
+
+	if user != nil {
 		c.JSON(http.StatusOK, UserResponse{
 			Response: Response{StatusCode: 0, StatusMsg: ""},
-			User:     user,
+			User:     ResponseUser,
 		})
 	} else {
 		c.JSON(http.StatusOK, UserResponse{
