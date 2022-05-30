@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	_ "github.com/go-sql-driver/mysql"
 	"net/http"
 )
 
@@ -14,17 +15,27 @@ type UserListResponse struct {
 func RelationAction(c *gin.Context) {
 	token := c.Query("token")
 	action_type := c.Query("action_type")
+	dbInit()
+	defer db.Close()
+	var user []dbUser
+	var rootUser []dbUser
+	//查询
+	db.Select(&user, "select ID, Name, FollowCount, FollowerCount, IsFollow from User where token=?", token)
+	//获取粉丝数和关注数全局变量
+	db.Select(&rootUser, "select FollowCount, FollowerCount from User where token=?", "rootroooot")
 
-	if _, exist := usersLoginInfo[token]; exist {
+	if user != nil {
 		if action_type == "1" {
-			DemoUser.IsFollow = true    //所有用户共用
-			DemoUser.FollowerCount += 1 //所有用户共用
-			DemoUser.FollowCount += 1   //所有用户共用
+			db.Exec("update User set IsFollow=? where token=?", token, true)
+			//关注数和粉丝数增加为全局变量
+			db.Exec("update User set FollowerCount=? where token=?", "rootroooot", rootUser[0].FollowerCount+1)
+			db.Exec("update User set FollowCount=? where token=?", "rootroooot", rootUser[0].FollowCount+1)
 			c.JSON(http.StatusOK, Response{StatusCode: 0, StatusMsg: "Follow success"})
 		} else if action_type == "2" {
-			DemoUser.IsFollow = false   //所有用户共用
-			DemoUser.FollowerCount -= 1 //所有用户共用
-			DemoUser.FollowCount -= 1   //所有用户共用
+			db.Exec("update User set IsFollow=? where token=?", token, false)
+			//关注数和粉丝数为全局变量
+			db.Exec("update User set FollowerCount=? where token=?", "rootroooot", rootUser[0].FollowerCount+1)
+			db.Exec("update User set FollowCount=? where token=?", "rootroooot", rootUser[0].FollowCount+1)
 			c.JSON(http.StatusOK, Response{StatusCode: 0, StatusMsg: "Unfollow success"})
 		}
 	} else {
