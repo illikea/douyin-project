@@ -34,8 +34,8 @@ func RelationAction(c *gin.Context) {
 		} else if action_type == "2" {
 			db.Exec("update User set IsFollow=? where token=?", token, false)
 			//关注数和粉丝数为全局变量
-			db.Exec("update User set FollowerCount=? where token=?", "rootroooot", rootUser[0].FollowerCount+1)
-			db.Exec("update User set FollowCount=? where token=?", "rootroooot", rootUser[0].FollowCount+1)
+			db.Exec("update User set FollowerCount=? where token=?", "rootroooot", rootUser[0].FollowerCount-1)
+			db.Exec("update User set FollowCount=? where token=?", "rootroooot", rootUser[0].FollowCount-1)
 			c.JSON(http.StatusOK, Response{StatusCode: 0, StatusMsg: "Unfollow success"})
 		}
 	} else {
