@@ -41,8 +41,11 @@ func Register(c *gin.Context) {
 	dbInit()
 	defer db.Close()
 	var user []dbUser
+	var rootUser []dbUser
 	//查询
 	db.Select(&user, "select ID from User where token=?", token)
+	//获取粉丝数和关注数全局变量
+	db.Select(&rootUser, "select FollowCount, FollowerCount from User where token=?", "rootroooot")
 	//若查询到则直接返回
 	if user != nil {
 		c.JSON(http.StatusOK, UserLoginResponse{
@@ -62,12 +65,16 @@ func Register(c *gin.Context) {
 			c.JSON(http.StatusOK, UserLoginResponse{
 				Response: Response{StatusCode: 1, StatusMsg: "User register fail"},
 			})
+		} else {
+			//先修改当前用户粉丝和关注数，后返回响应
+			db.Exec("update User set FollowerCount=? where token=?", token, rootUser[0].FollowerCount)
+			db.Exec("update User set FollowCount=? where token=?", token, rootUser[0].FollowCount)
+			c.JSON(http.StatusOK, UserLoginResponse{
+				Response: Response{StatusCode: 0, StatusMsg: "User register success"},
+				UserId:   userIdSequence,
+				Token:    username + password,
+			})
 		}
-		c.JSON(http.StatusOK, UserLoginResponse{
-			Response: Response{StatusCode: 0, StatusMsg: "User register success"},
-			UserId:   userIdSequence,
-			Token:    username + password,
-		})
 	}
 }
 
@@ -80,10 +87,15 @@ func Login(c *gin.Context) {
 	dbInit()
 	defer db.Close()
 	var user []dbUser
+	var rootUser []dbUser
 	//查询
 	db.Select(&user, "select ID from User where token=?", token)
-
+	//获取粉丝数和关注数全局变量
+	db.Select(&rootUser, "select FollowCount, FollowerCount from User where token=?", "rootroooot")
 	if user != nil {
+		//先修改当前用户粉丝和关注数，后返回响应
+		db.Exec("update User set FollowerCount=? where token=?", token, rootUser[0].FollowerCount)
+		db.Exec("update User set FollowCount=? where token=?", token, rootUser[0].FollowCount)
 		c.JSON(http.StatusOK, UserLoginResponse{
 			Response: Response{StatusCode: 0},
 			UserId:   user[0].ID,
