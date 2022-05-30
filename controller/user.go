@@ -126,8 +126,8 @@ func UserInfo(c *gin.Context) {
 		var ResponseUser = User{
 			Id:            user[0].ID,
 			Name:          user[0].Name,
-			FollowCount:   user[0].FollowCount,
-			FollowerCount: user[0].FollowerCount,
+			FollowCount:   rootUser[0].FollowCount,
+			FollowerCount: rootUser[0].FollowerCount,
 			IsFollow:      user[0].IsFollow,
 		}
 		c.JSON(http.StatusOK, UserResponse{
