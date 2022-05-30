@@ -30,12 +30,16 @@ func RelationAction(c *gin.Context) {
 			//关注数和粉丝数增加为全局变量
 			db.Exec("update User set FollowerCount=? where token=?", "rootroooot", rootUser[0].FollowerCount+1)
 			db.Exec("update User set FollowCount=? where token=?", "rootroooot", rootUser[0].FollowCount+1)
+			db.Exec("insert into FollowList(FollowCount, FollowerCount, ID, IsFollow, Name, token)value(?, ?, ?, ?, ?, ?)", rootUser[0].FollowCount+1, rootUser[0].FollowerCount+1, user[0].ID, 1, user[0].Name, token)
+			db.Exec("insert into FollowerList(FollowCount, FollowerCount, ID, IsFollow, Name, token)value(?, ?, ?, ?, ?, ?)", rootUser[0].FollowCount+1, rootUser[0].FollowerCount+1, user[0].ID, 1, user[0].Name, token)
 			c.JSON(http.StatusOK, Response{StatusCode: 0, StatusMsg: "Follow success"})
 		} else if action_type == "2" {
 			db.Exec("update User set IsFollow=? where token=?", token, false)
 			//关注数和粉丝数为全局变量
 			db.Exec("update User set FollowerCount=? where token=?", "rootroooot", rootUser[0].FollowerCount-1)
 			db.Exec("update User set FollowCount=? where token=?", "rootroooot", rootUser[0].FollowCount-1)
+			db.Exec("delete from FollowList where token=?", token)
+			db.Exec("delete from FollowerList where token=?", token)
 			c.JSON(http.StatusOK, Response{StatusCode: 0, StatusMsg: "Unfollow success"})
 		}
 	} else {
@@ -45,20 +49,54 @@ func RelationAction(c *gin.Context) {
 
 // FollowList all users have same follow list
 func FollowList(c *gin.Context) {
+	dbInit()
+	defer db.Close()
+	var userList []User
+	rows, _ := db.Query("select ID, Name, FollowCount, FollowerCount, IsFollow from FollowList where ID>?", -1)
+	defer rows.Close()
+	for rows.Next() {
+		var user dbUser
+		rows.Scan(&user.ID, &user.Name, &user.FollowCount, &user.FollowerCount, &user.IsFollow)
+		userList = append(userList, User{
+			Id:            user.ID,
+			Name:          user.Name,
+			FollowCount:   user.FollowCount,
+			FollowerCount: user.FollowerCount,
+			IsFollow:      user.IsFollow,
+		})
+	}
 	c.JSON(http.StatusOK, UserListResponse{
 		Response: Response{
 			StatusCode: 0,
+			StatusMsg:  "",
 		},
-		UserList: []User{DemoUser},
+		UserList: userList,
 	})
 }
 
 // FollowerList all users have same follower list
 func FollowerList(c *gin.Context) {
+	dbInit()
+	defer db.Close()
+	var userList []User
+	rows, _ := db.Query("select ID, Name, FollowCount, FollowerCount, IsFollow from FollowerList where ID>?", -1)
+	defer rows.Close()
+	for rows.Next() {
+		var user dbUser
+		rows.Scan(&user.ID, &user.Name, &user.FollowCount, &user.FollowerCount, &user.IsFollow)
+		userList = append(userList, User{
+			Id:            user.ID,
+			Name:          user.Name,
+			FollowCount:   user.FollowCount,
+			FollowerCount: user.FollowerCount,
+			IsFollow:      user.IsFollow,
+		})
+	}
 	c.JSON(http.StatusOK, UserListResponse{
 		Response: Response{
 			StatusCode: 0,
+			StatusMsg:  "",
 		},
-		UserList: []User{DemoUser},
+		UserList: userList,
 	})
 }

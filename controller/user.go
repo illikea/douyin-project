@@ -60,7 +60,7 @@ func Register(c *gin.Context) {
 		//usersLoginInfo[token] = newUser
 
 		//mysql test
-		_, err := db.Exec("insert into User(FollowCount, FollowerCount, ID, IsFollow, Name, token)value(?, ?, ?, ?, ?, ?)", 0, 0, 0, 0, username, token)
+		_, err := db.Exec("insert into User(FollowCount, FollowerCount, ID, IsFollow, Name, token)value(?, ?, ?, ?, ?, ?)", 0, 0, 1, 0, username, token)
 		if err != nil {
 			c.JSON(http.StatusOK, UserLoginResponse{
 				Response: Response{StatusCode: 1, StatusMsg: "User register fail"},
