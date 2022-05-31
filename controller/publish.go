@@ -47,15 +47,15 @@ func Publish(c *gin.Context) {
 		return
 	}
 
-	/*DemoVideos = append(DemoVideos, Video{
+	DemoVideos = append(DemoVideos, Video{
 		Id:            1,
 		Author:        DemoUser,
-		PlayUrl:       "127.0.0.1:8080/static/vergil.mp4",
+		PlayUrl:       "127.0.0.1:8080/static/" + filename,
 		CoverUrl:      "https://cdn.pixabay.com/photo/2016/03/27/18/10/bear-1283347_1280.jpg",
 		FavoriteCount: 0,
 		CommentCount:  0,
 		IsFavorite:    false,
-	})*/
+	})
 	c.JSON(http.StatusOK, Response{
 		StatusCode: 0,
 		StatusMsg:  finalName + " uploaded successfully",
