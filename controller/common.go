@@ -56,3 +56,14 @@ type dbUser struct {
 	IsFollow      bool   `db:"IsFollow"`
 	token         string `db:"token"`
 }
+
+type dbVideo struct {
+	ID            int64  `db:"ID"`
+	Author        string `db:"Author"`
+	PlayUrl       string `db:"PlayUrl"`
+	CoverUrl      string `db:"CoverUrl"`
+	FavoriteCount int64  `db:"FavoriteCount"`
+	CommentCount  int64  `db:"CommentCount"`
+	IsFavorite    bool   `db:"IsFavorite"`
+	Title         string `db:"Title"`
+}
