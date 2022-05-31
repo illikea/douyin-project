@@ -35,14 +35,8 @@ func Publish(c *gin.Context) {
 		return
 	}
 
-	title, err := c.FormFile("title")
-	if err != nil {
-		c.JSON(http.StatusOK, Response{
-			StatusCode: 1,
-			StatusMsg:  err.Error(),
-		})
-		return
-	}
+	//获取视频标题
+	title := c.PostForm("title")
 	filename := filepath.Base(data.Filename)
 	//user := usersLoginInfo[token]  默认用户投稿test
 	finalName := fmt.Sprintf("%d_%s", users[0].ID, filename)
