@@ -10,6 +10,15 @@ var DemoVideos = []Video{
 		CommentCount:  0,
 		IsFavorite:    false,
 	},
+	{
+		Id:            1,
+		Author:        DemoUser,
+		PlayUrl:       "127.0.0.1:8080/static/vergil.mp4",
+		CoverUrl:      "https://cdn.pixabay.com/photo/2016/03/27/18/10/bear-1283347_1280.jpg",
+		FavoriteCount: 0,
+		CommentCount:  0,
+		IsFavorite:    false,
+	},
 }
 
 var DemoComments = []Comment{
