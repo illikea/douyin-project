@@ -20,12 +20,11 @@ func Publish(c *gin.Context) {
 	defer db.Close()
 	var users []dbUser
 	//查询
-	db.Select(&users, "select FollowCount, FollowerCount, ID, IsFollow, Name, token from User where token=?", token)
+	db.Select(&users, "select ID, Name from User where token=?", token)
 	if users == nil {
 		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
 		return
 	}
-	user := users[0]
 
 	data, err := c.FormFile("data")
 	if err != nil {
@@ -46,7 +45,7 @@ func Publish(c *gin.Context) {
 	}
 	filename := filepath.Base(data.Filename)
 	//user := usersLoginInfo[token]  默认用户投稿test
-	finalName := fmt.Sprintf("%d_%s", user.ID, filename)
+	finalName := fmt.Sprintf("%d_%s", users[0].ID, filename)
 	saveFile := filepath.Join("./public/", finalName)
 	if err := c.SaveUploadedFile(data, saveFile); err != nil {
 		c.JSON(http.StatusOK, Response{
@@ -56,7 +55,7 @@ func Publish(c *gin.Context) {
 		return
 	}
 
-	db.Exec("insert into Video(ID, Author, PlayUrl, CoverUrl, FavoriteCount, CommentCount, IsFavorite, Title)value(?, ?, ?, ?, ?, ?, ?, ?)", 1, user.token, "http://127.0.0.1:8080/static/"+filename, "https://cdn.pixabay.com/photo/2016/03/27/18/10/bear-1283347_1280.jpg", 0, 0, 0, title)
+	db.Exec("insert into Video(ID, Author, PlayUrl, CoverUrl, FavoriteCount, CommentCount, IsFavorite, Title)value(?, ?, ?, ?, ?, ?, ?, ?)", 1, token, "http://127.0.0.1:8080/static/"+filename, "https://cdn.pixabay.com/photo/2016/03/27/18/10/bear-1283347_1280.jpg", 0, 0, 0, title)
 	c.JSON(http.StatusOK, Response{
 		StatusCode: 0,
 		StatusMsg:  finalName + " uploaded successfully",
