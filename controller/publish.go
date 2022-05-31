@@ -67,7 +67,7 @@ func Publish(c *gin.Context) {
 func PublishList(c *gin.Context) {
 	token := c.Query("token")
 	var videoList []Video
-	rows, _ := db.Query("select ID, Author, PlayUrl, CoverUrl, FavoriteCount, CommentCount, IsFavorite, Title from Vedio where Author=?", token)
+	rows, _ := db.Query("select ID, Author, PlayUrl, CoverUrl, FavoriteCount, CommentCount, IsFavorite, Title from Vedio where ID>?", -1)
 	defer rows.Close()
 	//获取用户信息
 	var user []dbUser
