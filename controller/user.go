@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	idworker "github.com/gitstliu/go-id-worker"
 	_ "github.com/go-sql-driver/mysql"
 	"net/http"
 	"sync/atomic"
@@ -38,12 +39,18 @@ func Register(c *gin.Context) {
 	password := c.Query("password")
 
 	token := username + password
+
+	//生成唯一ID
+	currWoker := &idworker.IdWorker{}
+	currWoker.InitIdWorker(1000, 1)
+	newID, _ := currWoker.NextId()
+
 	dbInit()
 	defer db.Close()
 	var user []dbUser
 	var rootUser []dbUser
-	//查询
-	db.Select(&user, "select ID from User where token=?", token)
+	//查询,保证用户名唯一
+	db.Select(&user, "select ID from User where Name=?", username)
 	//获取粉丝数和关注数全局变量
 	db.Select(&rootUser, "select FollowCount, FollowerCount from User where token=?", "rootroooot")
 	//若查询到则直接返回
@@ -52,15 +59,8 @@ func Register(c *gin.Context) {
 			Response: Response{StatusCode: 1, StatusMsg: "User already exist"},
 		})
 	} else {
-		atomic.AddInt64(&userIdSequence, 1)
-		//newUser := User{
-		//	Id:   userIdSequence,
-		//	Name: username,
-		//}
-		//usersLoginInfo[token] = newUser
-
-		//mysql test
-		_, err := db.Exec("insert into User(FollowCount, FollowerCount, ID, IsFollow, Name, token)value(?, ?, ?, ?, ?, ?)", 0, 0, 1, 0, username, token)
+		atomic.AddInt64(&userIdSequence, newID)
+		_, err := db.Exec("insert into User(FollowCount, FollowerCount, ID, IsFollow, Name, token)value(?, ?, ?, ?, ?, ?)", 0, 0, newID, 0, username, token)
 		if err != nil {
 			c.JSON(http.StatusOK, UserLoginResponse{
 				Response: Response{StatusCode: 1, StatusMsg: "User register fail"},
@@ -71,7 +71,7 @@ func Register(c *gin.Context) {
 			db.Exec("update User set FollowCount=? where token=?", token, rootUser[0].FollowCount)
 			c.JSON(http.StatusOK, UserLoginResponse{
 				Response: Response{StatusCode: 0, StatusMsg: "User register success"},
-				UserId:   userIdSequence,
+				UserId:   newID,
 				Token:    username + password,
 			})
 		}
