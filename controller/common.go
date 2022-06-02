@@ -2,6 +2,7 @@ package controller
 
 import (
 	"fmt"
+	idworker "github.com/gitstliu/go-id-worker"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -66,4 +67,12 @@ type dbVideo struct {
 	CommentCount  int64  `db:"CommentCount"`
 	IsFavorite    bool   `db:"IsFavorite"`
 	Title         string `db:"Title"`
+}
+
+//生成唯一ID
+func makeId() int64 {
+	currWoker := &idworker.IdWorker{}
+	currWoker.InitIdWorker(1000, 1)
+	newID, _ := currWoker.NextId()
+	return newID
 }

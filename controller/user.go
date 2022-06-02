@@ -2,7 +2,6 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
-	idworker "github.com/gitstliu/go-id-worker"
 	_ "github.com/go-sql-driver/mysql"
 	"net/http"
 	"sync/atomic"
@@ -38,12 +37,8 @@ func Register(c *gin.Context) {
 	username := c.Query("username")
 	password := c.Query("password")
 
+	newID := makeId()
 	token := username + password
-
-	//生成唯一ID
-	currWoker := &idworker.IdWorker{}
-	currWoker.InitIdWorker(1000, 1)
-	newID, _ := currWoker.NextId()
 
 	dbInit()
 	defer db.Close()
