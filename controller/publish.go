@@ -59,7 +59,7 @@ func Publish(c *gin.Context) {
 
 // PublishList all users have same publish video list
 func PublishList(c *gin.Context) {
-	token := c.Query("token")
+	/*token := c.Query("token")
 	var videoList []Video
 	rows, _ := db.Query("select ID, PlayUrl, CoverUrl, FavoriteCount, CommentCount, IsFavorite, Title from Video where ID>?", 0)
 	defer rows.Close()
@@ -88,12 +88,12 @@ func PublishList(c *gin.Context) {
 				IsFavorite:    video.IsFavorite,
 			})
 		}
-	}
+	}*/
 	c.JSON(http.StatusOK, VideoListResponse{
 		Response: Response{
 			StatusCode: 0,
 			StatusMsg:  "",
 		},
-		VideoList: videoList,
+		VideoList: DemoVideos,
 	})
 }
