@@ -72,18 +72,21 @@ func PublishList(c *gin.Context) {
 		FollowerCount: user[0].FollowerCount,
 		IsFollow:      user[0].IsFollow,
 	}
-	for rows.Next() {
-		var video dbVideo
-		rows.Scan(&video.ID, &video.PlayUrl, &video.CoverUrl, &video.FavoriteCount, &video.CommentCount, &video.IsFavorite, &video.Title)
-		videoList = append(videoList, Video{
-			Id:            video.ID,
-			Author:        ResponseUser,
-			PlayUrl:       video.PlayUrl,
-			CoverUrl:      video.CoverUrl,
-			FavoriteCount: video.FavoriteCount,
-			CommentCount:  video.CommentCount,
-			IsFavorite:    video.IsFavorite,
-		})
+	//如果rows为空指针，则视频列表为空，否则填充视频列表
+	if rows != nil {
+		for rows.Next() {
+			var video dbVideo
+			rows.Scan(&video.ID, &video.PlayUrl, &video.CoverUrl, &video.FavoriteCount, &video.CommentCount, &video.IsFavorite, &video.Title)
+			videoList = append(videoList, Video{
+				Id:            video.ID,
+				Author:        ResponseUser,
+				PlayUrl:       video.PlayUrl,
+				CoverUrl:      video.CoverUrl,
+				FavoriteCount: video.FavoriteCount,
+				CommentCount:  video.CommentCount,
+				IsFavorite:    video.IsFavorite,
+			})
+		}
 	}
 	c.JSON(http.StatusOK, VideoListResponse{
 		Response: Response{
