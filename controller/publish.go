@@ -59,10 +59,11 @@ func Publish(c *gin.Context) {
 
 // PublishList all users have same publish video list
 func PublishList(c *gin.Context) {
-	/*token := c.Query("token")
+	token := c.Query("token")
 	var videoList []Video
-	rows, _ := db.Query("select ID, PlayUrl, CoverUrl, FavoriteCount, CommentCount, IsFavorite, Title from Video where ID>?", 0)
-	defer rows.Close()
+	//获取视频列表
+	var videos []dbVideo
+	db.Select(&videos, "select ID, PlayUrl, CoverUrl, FavoriteCount, CommentCount, IsFavorite, Title from Video where Author=?", token)
 	//获取用户信息
 	var user []dbUser
 	db.Select(&user, "select ID, Name, FollowCount, FollowerCount, IsFollow from User where token=?", token)
@@ -73,27 +74,23 @@ func PublishList(c *gin.Context) {
 		FollowerCount: user[0].FollowerCount,
 		IsFollow:      user[0].IsFollow,
 	}
-	//如果rows为空指针，则视频列表为空，否则填充视频列表
-	if rows != nil {
-		for rows.Next() {
-			var video dbVideo
-			rows.Scan(&video.ID, &video.PlayUrl, &video.CoverUrl, &video.FavoriteCount, &video.CommentCount, &video.IsFavorite, &video.Title)
-			videoList = append(videoList, Video{
-				Id:            video.ID,
-				Author:        ResponseUser,
-				PlayUrl:       video.PlayUrl,
-				CoverUrl:      video.CoverUrl,
-				FavoriteCount: video.FavoriteCount,
-				CommentCount:  video.CommentCount,
-				IsFavorite:    video.IsFavorite,
-			})
-		}
-	}*/
+	//填充视频列表
+	for _, video := range videos {
+		videoList = append(videoList, Video{
+			Id:            video.ID,
+			Author:        ResponseUser,
+			PlayUrl:       video.PlayUrl,
+			CoverUrl:      video.CoverUrl,
+			FavoriteCount: video.FavoriteCount,
+			CommentCount:  video.CommentCount,
+			IsFavorite:    video.IsFavorite,
+		})
+	}
 	c.JSON(http.StatusOK, VideoListResponse{
 		Response: Response{
 			StatusCode: 0,
 			StatusMsg:  "",
 		},
-		VideoList: DemoVideos,
+		VideoList: videoList,
 	})
 }
