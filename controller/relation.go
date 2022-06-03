@@ -76,16 +76,17 @@ func FollowList(c *gin.Context) {
 
 // FollowerList all users have same follower list
 func FollowerList(c *gin.Context) {
+	userID := c.Query("user_id")
 	dbInit()
 	defer db.Close()
 	var userList []User
-	rows, _ := db.Query("select ID, Name, FollowCount, FollowerCount, IsFollow from FollowerList where ID>?", -1)
-	defer rows.Close()
-	for rows.Next() {
-		var user dbUser
-		rows.Scan(&user.ID, &user.Name, &user.FollowCount, &user.FollowerCount, &user.IsFollow)
+	//从数据库获取粉丝列表
+	var followList []dbFollower
+	db.Select(&followList, "select UserID, Name, FollowCount, FollowerCount, IsFollow from FollowList where FollowerID=?", userID)
+	//填充至返回的列表
+	for _, user := range followList {
 		userList = append(userList, User{
-			Id:            user.ID,
+			Id:            user.UserID,
 			Name:          user.Name,
 			FollowCount:   user.FollowCount,
 			FollowerCount: user.FollowerCount,
