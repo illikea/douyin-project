@@ -39,7 +39,6 @@ func RelationAction(c *gin.Context) {
 			db.Exec("update User set FollowerCount=? where token=?", "rootroooot", rootUser[0].FollowerCount-1)
 			db.Exec("update User set FollowCount=? where token=?", "rootroooot", rootUser[0].FollowCount-1)
 			db.Exec("delete from FollowList where token=?", token)
-			db.Exec("delete from FollowerList where token=?", token)
 			c.JSON(http.StatusOK, Response{StatusCode: 0, StatusMsg: "Unfollow success"})
 		}
 	} else {
@@ -49,16 +48,17 @@ func RelationAction(c *gin.Context) {
 
 // FollowList all users have same follow list
 func FollowList(c *gin.Context) {
+	userID := c.Query("user_id")
 	dbInit()
 	defer db.Close()
 	var userList []User
-	rows, _ := db.Query("select ID, Name, FollowCount, FollowerCount, IsFollow from FollowList where ID>?", -1)
-	defer rows.Close()
-	for rows.Next() {
-		var user dbUser
-		rows.Scan(&user.ID, &user.Name, &user.FollowCount, &user.FollowerCount, &user.IsFollow)
+	//从数据库获取关注列表
+	var followList []dbFollower
+	db.Select(&followList, "select FollowerID, Name, FollowCount, FollowerCount, IsFollow from FollowList where UserID=?", userID)
+	//填充至返回的列表
+	for _, user := range followList {
 		userList = append(userList, User{
-			Id:            user.ID,
+			Id:            user.FollowerID,
 			Name:          user.Name,
 			FollowCount:   user.FollowCount,
 			FollowerCount: user.FollowerCount,

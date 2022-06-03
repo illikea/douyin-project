@@ -58,6 +58,16 @@ type dbUser struct {
 	token         string `db:"token"`
 }
 
+type dbFollower struct {
+	UserID        int64  `db:"UserID"`
+	FollowerID    int64  `db:"FollowerID"`
+	Name          string `db:"Name"`
+	FollowCount   int64  `db:"FollowCount"`
+	FollowerCount int64  `db:"FollowerCount"`
+	IsFollow      bool   `db:"IsFollow"`
+	token         string `db:"token"`
+}
+
 type dbVideo struct {
 	ID            int64  `db:"ID"`
 	Author        string `db:"Author"`
