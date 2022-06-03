@@ -16,6 +16,7 @@ type VideoListResponse struct {
 func Publish(c *gin.Context) {
 	token := c.PostForm("token")
 
+	newID := makeId()
 	dbInit()
 	defer db.Close()
 	var users []dbUser
@@ -48,7 +49,7 @@ func Publish(c *gin.Context) {
 		return
 	}
 
-	db.Exec("insert into Video(ID, Author, PlayUrl, CoverUrl, FavoriteCount, CommentCount, IsFavorite, Title)value(?, ?, ?, ?, ?, ?, ?, ?)", users[0].ID, token, "http://127.0.0.1:8080/static/"+finalName, "https://cdn.pixabay.com/photo/2016/03/27/18/10/bear-1283347_1280.jpg", 0, 0, 0, title)
+	db.Exec("insert into Video(ID, AuthorID, PlayUrl, CoverUrl, FavoriteCount, CommentCount, IsFavorite, Title)value(?, ?, ?, ?, ?, ?, ?, ?)", newID, users[0].ID, "http://127.0.0.1:8080/static/"+finalName, "https://cdn.pixabay.com/photo/2016/03/27/18/10/bear-1283347_1280.jpg", 0, 0, 0, title)
 	c.JSON(http.StatusOK, Response{
 		StatusCode: 0,
 		StatusMsg:  finalName + " uploaded successfully",
@@ -62,9 +63,6 @@ func PublishList(c *gin.Context) {
 	dbInit()
 	defer db.Close()
 	var videoList []Video
-	//获取视频列表
-	var videos []dbVideo
-	db.Select(&videos, "select ID, PlayUrl, CoverUrl, FavoriteCount, CommentCount, IsFavorite, Title from Video where Author=?", token)
 	//获取用户信息
 	var user []dbUser
 	db.Select(&user, "select ID, Name, FollowCount, FollowerCount, IsFollow from User where token=?", token)
@@ -75,6 +73,9 @@ func PublishList(c *gin.Context) {
 		FollowerCount: user[0].FollowerCount,
 		IsFollow:      user[0].IsFollow,
 	}
+	//获取视频列表
+	var videos []dbVideo
+	db.Select(&videos, "select ID, PlayUrl, CoverUrl, FavoriteCount, CommentCount, IsFavorite, Title from Video where AuthorID=?", user[0].ID)
 	//填充视频列表
 	for _, video := range videos {
 		videoList = append(videoList, Video{
