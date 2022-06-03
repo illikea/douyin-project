@@ -24,7 +24,7 @@ func RelationAction(c *gin.Context) {
 	db.Select(&user, "select ID, Name, FollowCount, FollowerCount, IsFollow from User where token=?", token)
 	db.Select(&toUser, "select ID, Name, FollowCount, FollowerCount, IsFollow, token from User where ID=?", toUserID)
 
-	if user != nil {
+	if user != nil && toUser != nil {
 		if actionType == "1" {
 			db.Exec("update User set IsFollow=? where token=?", token, true)
 			//修改用户关注数和粉丝数，并在FollowList新增一行
