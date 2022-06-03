@@ -16,7 +16,6 @@ type VideoListResponse struct {
 func Publish(c *gin.Context) {
 	token := c.PostForm("token")
 
-	newID := makeId()
 	dbInit()
 	defer db.Close()
 	var users []dbUser
@@ -26,7 +25,6 @@ func Publish(c *gin.Context) {
 		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
 		return
 	}
-
 	data, err := c.FormFile("data")
 	if err != nil {
 		c.JSON(http.StatusOK, Response{
@@ -50,7 +48,7 @@ func Publish(c *gin.Context) {
 		return
 	}
 
-	db.Exec("insert into Video(ID, Author, PlayUrl, CoverUrl, FavoriteCount, CommentCount, IsFavorite, Title)value(?, ?, ?, ?, ?, ?, ?, ?)", newID, token, "http://127.0.0.1:8080/static/"+finalName, "https://cdn.pixabay.com/photo/2016/03/27/18/10/bear-1283347_1280.jpg", 0, 0, 0, title)
+	db.Exec("insert into Video(ID, Author, PlayUrl, CoverUrl, FavoriteCount, CommentCount, IsFavorite, Title)value(?, ?, ?, ?, ?, ?, ?, ?)", users[0].ID, token, "http://127.0.0.1:8080/static/"+finalName, "https://cdn.pixabay.com/photo/2016/03/27/18/10/bear-1283347_1280.jpg", 0, 0, 0, title)
 	c.JSON(http.StatusOK, Response{
 		StatusCode: 0,
 		StatusMsg:  finalName + " uploaded successfully",
@@ -60,6 +58,9 @@ func Publish(c *gin.Context) {
 // PublishList all users have same publish video list
 func PublishList(c *gin.Context) {
 	token := c.Query("token")
+
+	dbInit()
+	defer db.Close()
 	var videoList []Video
 	//获取视频列表
 	var videos []dbVideo
