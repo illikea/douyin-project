@@ -43,11 +43,8 @@ func Register(c *gin.Context) {
 	dbInit()
 	defer db.Close()
 	var user []dbUser
-	var rootUser []dbUser
 	//查询,保证用户名唯一
 	db.Select(&user, "select ID from User where Name=?", username)
-	//获取粉丝数和关注数全局变量
-	db.Select(&rootUser, "select FollowCount, FollowerCount from User where token=?", "rootroooot")
 	//若查询到则直接返回
 	if user != nil {
 		c.JSON(http.StatusOK, UserLoginResponse{
@@ -61,9 +58,6 @@ func Register(c *gin.Context) {
 				Response: Response{StatusCode: 1, StatusMsg: "User register fail"},
 			})
 		} else {
-			//先修改当前用户粉丝和关注数，后返回响应
-			db.Exec("update User set FollowerCount=? where token=?", token, rootUser[0].FollowerCount)
-			db.Exec("update User set FollowCount=? where token=?", token, rootUser[0].FollowCount)
 			c.JSON(http.StatusOK, UserLoginResponse{
 				Response: Response{StatusCode: 0, StatusMsg: "User register success"},
 				UserId:   newID,
@@ -82,15 +76,9 @@ func Login(c *gin.Context) {
 	dbInit()
 	defer db.Close()
 	var user []dbUser
-	var rootUser []dbUser
 	//查询
 	db.Select(&user, "select ID from User where token=?", token)
-	//获取粉丝数和关注数全局变量
-	db.Select(&rootUser, "select FollowCount, FollowerCount from User where token=?", "rootroooot")
 	if user != nil {
-		//先修改当前用户粉丝和关注数，后返回响应
-		db.Exec("update User set FollowerCount=? where token=?", token, rootUser[0].FollowerCount)
-		db.Exec("update User set FollowCount=? where token=?", token, rootUser[0].FollowCount)
 		c.JSON(http.StatusOK, UserLoginResponse{
 			Response: Response{StatusCode: 0},
 			UserId:   user[0].ID,
@@ -109,20 +97,14 @@ func UserInfo(c *gin.Context) {
 	dbInit()
 	defer db.Close()
 	var user []dbUser
-	var rootUser []dbUser
 	//查询
 	db.Select(&user, "select ID, Name, FollowCount, FollowerCount, IsFollow from User where token=?", token)
-	//获取粉丝数和关注数全局变量
-	db.Select(&rootUser, "select FollowCount, FollowerCount from User where token=?", "rootroooot")
 	if user != nil {
-		//先修改当前用户粉丝和关注数，后返回响应
-		db.Exec("update User set FollowerCount=? where token=?", token, rootUser[0].FollowerCount)
-		db.Exec("update User set FollowCount=? where token=?", token, rootUser[0].FollowCount)
 		var ResponseUser = User{
 			Id:            user[0].ID,
 			Name:          user[0].Name,
-			FollowCount:   rootUser[0].FollowCount,
-			FollowerCount: rootUser[0].FollowerCount,
+			FollowCount:   user[0].FollowCount,
+			FollowerCount: user[0].FollowerCount,
 			IsFollow:      user[0].IsFollow,
 		}
 		c.JSON(http.StatusOK, UserResponse{
