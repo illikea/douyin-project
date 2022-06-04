@@ -26,17 +26,17 @@ func RelationAction(c *gin.Context) {
 
 	if user != nil && toUser != nil {
 		if actionType == "1" {
-			db.Exec("update User set IsFollow=? where token=?", token, true)
+			db.Exec("update User set IsFollow=? where token=?", true, token)
 			//修改用户关注数和粉丝数，并在FollowList新增一行
-			db.Exec("update User set FollowerCount=? where ID=?", toUser[0].ID, toUser[0].FollowerCount+1)
-			db.Exec("update User set FollowCount=? where ID=?", user[0].ID, user[0].FollowCount+1)
+			db.Exec("update User set FollowerCount=? where ID=?", toUser[0].FollowerCount+1, toUser[0].ID)
+			db.Exec("update User set FollowCount=? where ID=?", user[0].FollowCount+1, user[0].ID)
 			db.Exec("insert into FollowList(FollowCount, FollowerCount, FollowerID, UserID, IsFollow, Name, token)value(?, ?, ?, ?, ?, ?, ?)", 0, 0, user[0].ID, toUserID, 1, toUser[0].Name, toUser[0].token)
 			c.JSON(http.StatusOK, Response{StatusCode: 0, StatusMsg: "Follow success"})
 		} else if actionType == "2" {
-			db.Exec("update User set IsFollow=? where token=?", token, false)
+			db.Exec("update User set IsFollow=? where token=?", false, token)
 			//修改用户关注数和粉丝数，并在FollowList删除对应行
-			db.Exec("update User set FollowerCount=? where ID=?", toUser[0].ID, toUser[0].FollowerCount-1)
-			db.Exec("update User set FollowCount=? where ID=?", user[0].ID, user[0].FollowCount-1)
+			db.Exec("update User set FollowerCount=? where ID=?", toUser[0].FollowerCount-1, toUser[0].ID)
+			db.Exec("update User set FollowCount=? where ID=?", user[0].FollowCount-1, user[0].ID)
 			db.Exec("delete from FollowList where UserID=? AND FollowerID=?", toUser[0].ID, user[0].ID)
 			c.JSON(http.StatusOK, Response{StatusCode: 0, StatusMsg: "Unfollow success"})
 		}
