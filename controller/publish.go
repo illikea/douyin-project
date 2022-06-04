@@ -46,7 +46,8 @@ func Publish(c *gin.Context) {
 	finalName := fmt.Sprintf("%d_%s", users[0].ID, filename)
 	saveFile := filepath.Join("./public/", finalName)
 	//视频截取封面图，保存后返回图片名
-	snapshotName := GetSnapshot("./public/", "./public/", 1)
+	//pegName := finalName[:len(finalName)-4] + "cover"
+	snapshotName := GetSnapshot("./public/"+finalName, "./public/", 1)
 
 	if err := c.SaveUploadedFile(data, saveFile); err != nil {
 		c.JSON(http.StatusOK, Response{
