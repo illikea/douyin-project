@@ -79,6 +79,14 @@ type dbVideo struct {
 	Title         string `db:"Title"`
 }
 
+type dbComment struct {
+	ID          int64  `db:"ID"`
+	UserID      int64  `db:"UserID"`
+	VideoID     int64  `db:"VideoID"`
+	CommentText string `db:"CommentText"`
+	CreateDate  string `db:"CreateDate"`
+}
+
 //生成唯一ID
 func makeId() int64 {
 	currWoker := &idworker.IdWorker{}
