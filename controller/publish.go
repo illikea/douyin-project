@@ -66,6 +66,9 @@ func PublishList(c *gin.Context) {
 	//获取用户信息
 	var user []dbUser
 	db.Select(&user, "select ID, Name, FollowCount, FollowerCount, IsFollow from User where token=?", token)
+	if user == nil {
+		return
+	}
 	var ResponseUser = User{
 		Id:            user[0].ID,
 		Name:          user[0].Name,
