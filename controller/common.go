@@ -70,7 +70,7 @@ type dbFollower struct {
 
 type dbVideo struct {
 	ID            int64  `db:"ID"`
-	Author        string `db:"Author"`
+	AuthorID      string `db:"AuthorID"`
 	PlayUrl       string `db:"PlayUrl"`
 	CoverUrl      string `db:"CoverUrl"`
 	FavoriteCount int64  `db:"FavoriteCount"`
