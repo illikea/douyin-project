@@ -1,10 +1,15 @@
 package controller
 
 import (
+	"bytes"
 	"fmt"
+	"github.com/disintegration/imaging"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
+	"os"
 	"path/filepath"
+	"strings"
 )
 
 type VideoListResponse struct {
@@ -38,9 +43,11 @@ func Publish(c *gin.Context) {
 	//获取视频标题
 	title := c.PostForm("title")
 	filename := filepath.Base(data.Filename)
-	//user := usersLoginInfo[token]  默认用户投稿test
 	finalName := fmt.Sprintf("%d_%s", users[0].ID, filename)
 	saveFile := filepath.Join("./public/", finalName)
+	//视频截取封面图，保存后返回图片名
+	snapshotName := GetSnapshot("./public/", "./public/", 1)
+
 	if err := c.SaveUploadedFile(data, saveFile); err != nil {
 		c.JSON(http.StatusOK, Response{
 			StatusCode: 1,
@@ -49,7 +56,7 @@ func Publish(c *gin.Context) {
 		return
 	}
 
-	db.Exec("insert into Video(ID, AuthorID, PlayUrl, CoverUrl, FavoriteCount, CommentCount, IsFavorite, Title)value(?, ?, ?, ?, ?, ?, ?, ?)", newID, users[0].ID, "http://192.168.123.32:8080/static/"+finalName, "https://cdn.pixabay.com/photo/2016/03/27/18/10/bear-1283347_1280.jpg", 0, 0, 0, title)
+	db.Exec("insert into Video(ID, AuthorID, PlayUrl, CoverUrl, FavoriteCount, CommentCount, IsFavorite, Title)value(?, ?, ?, ?, ?, ?, ?, ?)", newID, users[0].ID, "http://192.168.123.32:8080/static/"+finalName, "http://192.168.123.32:8080/static/"+snapshotName, 0, 0, 0, title)
 	c.JSON(http.StatusOK, Response{
 		StatusCode: 0,
 		StatusMsg:  finalName + " uploaded successfully",
@@ -98,4 +105,33 @@ func PublishList(c *gin.Context) {
 		},
 		VideoList: videoList,
 	})
+}
+
+// GetSnapshot 生成视频缩略图并保存（作为封面）
+// 视频路径: videoPath, 生成的略缩图保存路径: snapshotPath, 略缩图所属帧数: frameNum, 返回值为略缩图文件名: snapshotName
+func GetSnapshot(videoPath, snapshotPath string, frameNum int) (snapshotName string) {
+	buf := bytes.NewBuffer(nil)
+	err := ffmpeg.Input(videoPath).
+		Filter("select", ffmpeg.Args{fmt.Sprintf("gte(n,%d)", frameNum)}).
+		Output("pipe:", ffmpeg.KwArgs{"vframes": 1, "format": "image2", "vcodec": "mjpeg"}).
+		WithOutput(buf, os.Stdout).
+		Run()
+	if err != nil {
+		log.Fatal("生成缩略图失败：", err)
+	}
+
+	img, err := imaging.Decode(buf)
+	if err != nil {
+		log.Fatal("生成缩略图失败：", err)
+	}
+
+	err = imaging.Save(img, snapshotPath+".jpeg")
+	if err != nil {
+		log.Fatal("生成缩略图失败：", err)
+	}
+
+	// 成功则返回生成的缩略图名
+	names := strings.Split(snapshotPath, "\\")
+	snapshotName = names[len(names)-1] + ".jpeg"
+	return
 }
