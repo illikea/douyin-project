@@ -25,22 +25,35 @@ func Feed(c *gin.Context) {
 		//获取用户信息
 		var users []dbUser
 		db.Select(&users, "select ID, Name, FollowCount, FollowerCount, IsFollow from User where ID=?", video.AuthorID)
-		var user = User{
-			Id:            users[0].ID,
-			Name:          users[0].Name,
-			FollowCount:   users[0].FollowCount,
-			FollowerCount: users[0].FollowerCount,
-			IsFollow:      users[0].IsFollow,
+		if users != nil {
+			var user = User{
+				Id:            users[0].ID,
+				Name:          users[0].Name,
+				FollowCount:   users[0].FollowCount,
+				FollowerCount: users[0].FollowerCount,
+				IsFollow:      users[0].IsFollow,
+			}
+			videoList = append(videoList, Video{
+				Id:            video.ID,
+				Author:        user,
+				PlayUrl:       video.PlayUrl,
+				CoverUrl:      video.CoverUrl,
+				FavoriteCount: video.FavoriteCount,
+				CommentCount:  video.CommentCount,
+				IsFavorite:    video.IsFavorite,
+			})
+		} else {
+			videoList = append(videoList, Video{
+				Id:            video.ID,
+				Author:        DemoUser,
+				PlayUrl:       video.PlayUrl,
+				CoverUrl:      video.CoverUrl,
+				FavoriteCount: video.FavoriteCount,
+				CommentCount:  video.CommentCount,
+				IsFavorite:    video.IsFavorite,
+			})
 		}
-		videoList = append(videoList, Video{
-			Id:            video.ID,
-			Author:        user,
-			PlayUrl:       video.PlayUrl,
-			CoverUrl:      video.CoverUrl,
-			FavoriteCount: video.FavoriteCount,
-			CommentCount:  video.CommentCount,
-			IsFavorite:    video.IsFavorite,
-		})
+
 	}
 
 	c.JSON(http.StatusOK, FeedResponse{
