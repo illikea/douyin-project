@@ -59,7 +59,7 @@ func CommentAction(c *gin.Context) {
 		} else if actionType == "2" {
 			commentID := c.Query("comment_id")
 			db.Exec("update Video set CommentCount=? where ID=?", videos[0].CommentCount-1, videoID)
-			db.Exec("delete from Video where ID=?", commentID)
+			db.Exec("delete from Comment where ID=?", commentID)
 
 			c.JSON(http.StatusOK, Response{StatusCode: 0, StatusMsg: "Delete comment success"})
 		}
