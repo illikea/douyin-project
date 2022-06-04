@@ -18,43 +18,6 @@ func Feed(c *gin.Context) {
 	defer db.Close()
 	var videoList []Video
 	//获取视频列表
-	/*var videos []dbVideo
-	db.Select(&videos, "select ID, AuthorID, PlayUrl, CoverUrl, FavoriteCount, CommentCount, IsFavorite, Title from Video where ID>?", 0)
-	//填充视频列表
-	for _, video := range videos {
-		//获取用户信息
-		var users []dbUser
-		db.Select(&users, "select ID, Name, FollowCount, FollowerCount, IsFollow from User where ID=?", video.AuthorID)
-		if users != nil {
-			var user = User{
-				Id:            users[0].ID,
-				Name:          users[0].Name,
-				FollowCount:   users[0].FollowCount,
-				FollowerCount: users[0].FollowerCount,
-				IsFollow:      users[0].IsFollow,
-			}
-			videoList = append(videoList, Video{
-				Id:            video.ID,
-				Author:        user,
-				PlayUrl:       video.PlayUrl,
-				CoverUrl:      video.CoverUrl,
-				FavoriteCount: video.FavoriteCount,
-				CommentCount:  video.CommentCount,
-				IsFavorite:    video.IsFavorite,
-			})
-		} else {
-			videoList = append(videoList, Video{
-				Id:            video.ID,
-				Author:        DemoUser,
-				PlayUrl:       video.PlayUrl,
-				CoverUrl:      video.CoverUrl,
-				FavoriteCount: video.FavoriteCount,
-				CommentCount:  video.CommentCount,
-				IsFavorite:    video.IsFavorite,
-			})
-		}
-	}*/
-	//获取视频列表
 	rows, _ := db.Query("select ID, AuthorID, PlayUrl, CoverUrl, FavoriteCount, CommentCount, IsFavorite, Title from Video where ID>?", 0)
 	//填充视频列表
 	if rows != nil {
@@ -71,15 +34,17 @@ func Feed(c *gin.Context) {
 				FollowerCount: users[0].FollowerCount,
 				IsFollow:      users[0].IsFollow,
 			}
-			videoList = append(videoList, Video{
-				Id:            video.ID,
-				Author:        user,
-				PlayUrl:       video.PlayUrl,
-				CoverUrl:      video.CoverUrl,
-				FavoriteCount: video.FavoriteCount,
-				CommentCount:  video.CommentCount,
-				IsFavorite:    video.IsFavorite,
-			})
+			videoList = append([]Video{
+				{
+					Id:            video.ID,
+					Author:        user,
+					PlayUrl:       video.PlayUrl,
+					CoverUrl:      video.CoverUrl,
+					FavoriteCount: video.FavoriteCount,
+					CommentCount:  video.CommentCount,
+					IsFavorite:    video.IsFavorite,
+				},
+			}, videoList...)
 		}
 	}
 

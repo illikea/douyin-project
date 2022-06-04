@@ -58,14 +58,14 @@ func Publish(c *gin.Context) {
 
 // PublishList all users have same publish video list
 func PublishList(c *gin.Context) {
-	token := c.Query("token")
+	userID := c.Query("user_id")
 
 	dbInit()
 	defer db.Close()
 	var videoList []Video
 	//获取用户信息
 	var user []dbUser
-	db.Select(&user, "select ID, Name, FollowCount, FollowerCount, IsFollow from User where token=?", token)
+	db.Select(&user, "select ID, Name, FollowCount, FollowerCount, IsFollow from User where ID=?", userID)
 	if user == nil {
 		return
 	}
