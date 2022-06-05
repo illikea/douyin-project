@@ -53,11 +53,11 @@ func FollowList(c *gin.Context) {
 	var userList []User
 	//从数据库获取关注列表
 	var followList []dbFollower
-	db.Select(&followList, "select FollowerID, Name, FollowCount, FollowerCount, IsFollow from FollowList where UserID=?", userID)
+	db.Select(&followList, "select UserID, Name, FollowCount, FollowerCount, IsFollow from FollowList where FollowerID=?", userID)
 	//填充至返回的列表
 	for _, user := range followList {
 		userList = append(userList, User{
-			Id:            user.FollowerID,
+			Id:            user.UserID,
 			Name:          user.Name,
 			FollowCount:   user.FollowCount,
 			FollowerCount: user.FollowerCount,
@@ -81,11 +81,11 @@ func FollowerList(c *gin.Context) {
 	var userList []User
 	//从数据库获取粉丝列表
 	var followList []dbFollower
-	db.Select(&followList, "select UserID, Name, FollowCount, FollowerCount, IsFollow from FollowList where FollowerID=?", userID)
+	db.Select(&followList, "select FollowerID, Name, FollowCount, FollowerCount, IsFollow from FollowList where UserID=?", userID)
 	//填充至返回的列表
 	for _, user := range followList {
 		userList = append(userList, User{
-			Id:            user.UserID,
+			Id:            user.FollowerID,
 			Name:          user.Name,
 			FollowCount:   user.FollowCount,
 			FollowerCount: user.FollowerCount,
