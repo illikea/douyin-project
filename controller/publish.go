@@ -132,7 +132,7 @@ func GetSnapshot(videoPath, snapshotPath string, frameNum int) (snapshotName str
 	}
 
 	// 成功则返回生成的缩略图名
-	names := strings.Split(snapshotPath, "\\")
+	names := strings.Split(snapshotPath, "/")
 	snapshotName = names[len(names)-1] + ".jpeg"
 	return
 }
