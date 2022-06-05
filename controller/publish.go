@@ -53,8 +53,8 @@ func Publish(c *gin.Context) {
 		return
 	}
 	//视频截取封面图，保存后返回图片名
-	//pegName := finalName[:len(finalName)-4] + "cover"
-	snapshotName := GetSnapshot("./public/"+finalName, "./public/", 1)
+	pegName := finalName[:len(finalName)-4] + "cover"
+	snapshotName := GetSnapshot("./public/"+finalName, "./public/"+pegName, 1)
 
 	db.Exec("insert into Video(ID, AuthorID, PlayUrl, CoverUrl, FavoriteCount, CommentCount, IsFavorite, Title)value(?, ?, ?, ?, ?, ?, ?, ?)", newID, users[0].ID, "http://192.168.123.32:8080/static/"+finalName, "http://192.168.123.32:8080/static/"+snapshotName, 0, 0, 0, title)
 	c.JSON(http.StatusOK, Response{
