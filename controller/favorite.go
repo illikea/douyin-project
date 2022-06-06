@@ -52,6 +52,16 @@ func FavoriteList(c *gin.Context) {
 	var videoList []Video
 	var users []dbUser
 	db.Select(&users, "select ID, Name, FollowCount, FollowerCount, IsFollow from User where ID=?", userID)
+	if users == nil {
+		c.JSON(http.StatusOK, VideoListResponse{
+			Response: Response{
+				StatusCode: 0,
+				StatusMsg:  "user not found",
+			},
+			VideoList: videoList,
+		})
+		return
+	}
 	var user = User{
 		Id:            users[0].ID,
 		Name:          users[0].Name,
@@ -66,6 +76,16 @@ func FavoriteList(c *gin.Context) {
 		//获取视频列表
 		var videos []dbVideo
 		db.Select(&videos, "select ID, PlayUrl, CoverUrl, FavoriteCount, CommentCount, IsFavorite, Title from Video where ID=?", video.VideoID)
+		if videos == nil {
+			c.JSON(http.StatusOK, VideoListResponse{
+				Response: Response{
+					StatusCode: 0,
+					StatusMsg:  "video not found",
+				},
+				VideoList: videoList,
+			})
+			return
+		}
 		//填充响应视频列表
 		videoList = append(videoList, Video{
 			Id:            videos[0].ID,
@@ -81,6 +101,7 @@ func FavoriteList(c *gin.Context) {
 	c.JSON(http.StatusOK, VideoListResponse{
 		Response: Response{
 			StatusCode: 0,
+			StatusMsg:  "",
 		},
 		VideoList: videoList,
 	})
