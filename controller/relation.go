@@ -26,6 +26,7 @@ func RelationAction(c *gin.Context) {
 
 	if user != nil && toUser != nil {
 		if actionType == "1" {
+			db.Exec("update User set IsFollow=? where token=?", true, token)
 			//判断是否是已关注的，若是则直接返回
 			var users []dbUser
 			db.Select(&users, "select Name from FollowList where UserID=? and FollowerID=?", toUser[0].ID, user[0].ID)
@@ -34,7 +35,6 @@ func RelationAction(c *gin.Context) {
 				return
 			}
 
-			db.Exec("update User set IsFollow=? where token=?", true, token)
 			//修改用户关注数和粉丝数，并在FollowList新增一行
 			db.Exec("update User set FollowerCount=? where ID=?", toUser[0].FollowerCount+1, toUser[0].ID)
 			db.Exec("update User set FollowCount=? where ID=?", user[0].FollowCount+1, user[0].ID)
