@@ -87,6 +87,11 @@ type dbComment struct {
 	CreateDate  string `db:"CreateDate"`
 }
 
+type dbLike struct {
+	UserID  int64 `db:"UserID"`
+	VideoID int64 `db:"VideoID"`
+}
+
 //生成唯一ID
 func makeId() int64 {
 	currWoker := &idworker.IdWorker{}
