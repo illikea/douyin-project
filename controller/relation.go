@@ -30,7 +30,7 @@ func RelationAction(c *gin.Context) {
 			var users []dbUser
 			db.Select(&users, "select Name from FollowList where UserID=? and FollowerID=?", toUser[0].ID, user[0].ID)
 			if users != nil {
-				c.JSON(http.StatusOK, Response{StatusCode: 0, StatusMsg: "You has followed this user before"})
+				c.JSON(http.StatusOK, Response{StatusCode: 0, StatusMsg: "You have followed this user before"})
 				return
 			}
 
