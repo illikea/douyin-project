@@ -81,15 +81,17 @@ func FollowerList(c *gin.Context) {
 	var userList []User
 	//从数据库获取粉丝列表
 	var followList []dbFollower
-	db.Select(&followList, "select FollowerID, Name, FollowCount, FollowerCount, IsFollow from FollowList where UserID=?", userID)
+	db.Select(&followList, "select FollowerID from FollowList where UserID=?", userID)
 	//填充至返回的列表
-	for _, user := range followList {
+	for _, follower := range followList {
+		var users []dbUser
+		db.Select(&users, "select ID, Name, FollowCount, FollowerCount, IsFollow from User where ID=?", follower.FollowerID)
 		userList = append(userList, User{
-			Id:            user.FollowerID,
-			Name:          user.Name,
-			FollowCount:   user.FollowCount,
-			FollowerCount: user.FollowerCount,
-			IsFollow:      user.IsFollow,
+			Id:            users[0].ID,
+			Name:          users[0].Name,
+			FollowCount:   users[0].FollowCount,
+			FollowerCount: users[0].FollowerCount,
+			IsFollow:      users[0].IsFollow,
 		})
 	}
 	c.JSON(http.StatusOK, UserListResponse{
