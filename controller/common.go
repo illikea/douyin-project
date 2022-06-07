@@ -77,6 +77,7 @@ type dbVideo struct {
 	CommentCount  int64  `db:"CommentCount"`
 	IsFavorite    bool   `db:"IsFavorite"`
 	Title         string `db:"Title"`
+	PublishTime   int64  `db:"PublishTime"`
 }
 
 type dbComment struct {
