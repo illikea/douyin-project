@@ -29,9 +29,9 @@ func RelationAction(c *gin.Context) {
 	}
 	if user != nil && toUser != nil {
 		if actionType == "1" {
-			//db.Exec("update User set IsFollow=? where token=?", true, token)
+			db.Exec("update User set IsFollow=? where ID=?", true, toUser[0].ID)
 			//判断是否是已关注的，若是则直接返回
-			var users []dbUser
+			var users []dbFollower
 			db.Select(&users, "select Name from FollowList where UserID=? and FollowerID=?", toUser[0].ID, user[0].ID)
 			if users != nil {
 				c.JSON(http.StatusOK, Response{StatusCode: 0, StatusMsg: "You have followed this user before"})
@@ -44,7 +44,7 @@ func RelationAction(c *gin.Context) {
 			db.Exec("insert into FollowList(FollowCount, FollowerCount, FollowerID, UserID, IsFollow, Name, token)value(?, ?, ?, ?, ?, ?, ?)", 0, 0, user[0].ID, toUserID, 1, toUser[0].Name, "1")
 			c.JSON(http.StatusOK, Response{StatusCode: 0, StatusMsg: "Follow success"})
 		} else if actionType == "2" {
-			//db.Exec("update User set IsFollow=? where token=?", false, token)
+			db.Exec("update User set IsFollow=? where ID=?", false, toUser[0].ID)
 			//修改用户关注数和粉丝数，并在FollowList删除对应行
 			db.Exec("update User set FollowerCount=? where ID=?", toUser[0].FollowerCount-1, toUser[0].ID)
 			db.Exec("update User set FollowCount=? where ID=?", user[0].FollowCount-1, user[0].ID)
